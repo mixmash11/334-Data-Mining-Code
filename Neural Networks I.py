@@ -28,19 +28,19 @@ def main():
 	# error( f[ 1 ], w0 , X[ 0 , ] )
 
 	#Test 4
-	max_iter = 100
-	np.random.seed(100)
-	X = np.array([[1,0,0],[1,0,1],[1,1,0],[1,1,1]])
-	w0 = 2 * np.random.random_sample(np.size(X,axis=1)) + -1
-	f = np.array([0,0,0,1])
-	eta = 0.1
-	print 'The input to this problem is: '
-	print X 
-	print 'The target for this problem is: '
-	print f
-	w = train_perceptron_sequential(X,f,max_iter,w0,eta)
-	print 'The result of w = train_perceptron_sequential(X,f,max_iter,w0,eta) is'
-	print w
+	# max_iter = 100
+	# np.random.seed(100)
+	# X = np.array([[1,0,0],[1,0,1],[1,1,0],[1,1,1]])
+	# w0 = 2 * np.random.random_sample(np.size(X,axis=1)) + -1
+	# f = np.array([0,0,0,1])
+	# eta = 0.1
+	# print 'The input to this problem is: '
+	# print X 
+	# print 'The target for this problem is: '
+	# print f
+	# w = train_perceptron_sequential(X,f,max_iter,w0,eta)
+	# print 'The result of w = train_perceptron_sequential(X,f,max_iter,w0,eta) is'
+	# print w
 
 	# Here is the output
 	# The input to this problem is: 
@@ -54,16 +54,38 @@ def main():
 	# [-0.31319012  0.25673877  0.14903518]
 
 	# Here is test code for the breast cancer dataset
-	df = change_Class( df )
-	X = df.as_matrix(columns = df.columns[1:(np.size(df.columns)-1)])
+	# df = change_Class( df )
+	# np.random.seed(100)
+	# X = df.as_matrix(columns = df.columns[1:(np.size(df.columns)-1)])
+	# w0 = 2 * np.random.random_sample(np.size(X,axis=1)) + -1
+	# f = (df.ix[:,np.size(df.columns)-1]-2)/2
+	# f = f.as_matrix()
+	# eta = 0.1
+	# max_iter = 100
+	# w = train_perceptron_sequential(X,f,max_iter,w0,eta)
+	# print "Weights of Data Set BC are:"
+	# print w
+	
+	#Test 1, Cross Validation & Applying a Perception
+	np.random.seed(100)
+	df = pd.read_csv('breast-cancer-data-cleaned.csv')
+	X = np.array([[1,0,0],[1,0,1],[1,1,0],[1,1,1]])
 	w0 = 2 * np.random.random_sample(np.size(X,axis=1)) + -1
-	f = (df.ix[:,np.size(df.columns)-1]-2)/2
-	f = f.as_matrix()
+	print('The results of predict(w0,X) ')
+	print(predict(w0,X))
+	
+	
+	#Test 2, Cross Validation & Applying a Perception
+	df = pd.read_csv('breast-cancer-data-cleaned.csv')
+	X = df.ix[1:100,2:(np.size(df,axis=1)-1)].as_matrix()
+	w0 = 2 * np.random.random_sample(np.size(X,axis=1)) + -1
 	eta = 0.1
-	max_iter = 100
-	w = train_perceptron_sequential(X,f,max_iter,w0,eta)
-	print "Weights of Data Set BC are:"
-	print w
+	f = df.ix[1:100,np.size(df,axis=1)-1].as_matrix()/2-1
+	max_iter=1
+	acc = accuracy(X,f,w0,max_iter,eta)
+	print 'The result of accuracy(X,f,w0,max.iter,eta) is'
+	print acc
+	
 	
 def readIntoDf( dfA ):
 	
@@ -116,7 +138,7 @@ def train_perceptron_sequential(X,f,max_iter,w0,eta):
 	numRows = X[:, 0 ].size
 	update = 1
 	
-	for i in range( 1, max_iter ):
+	for i in range( 0, max_iter ):
 		if update == 0:
 			return w
 		else:
@@ -138,7 +160,6 @@ def train_perceptron_sequential(X,f,max_iter,w0,eta):
 	
 	
 	return w
-	
 
 def update_rule( w, x, error, eta ):
 	# w = vector of weights
@@ -158,6 +179,44 @@ def update_rule( w, x, error, eta ):
 		new_w = np.add( w , x_error )
 		
 		return new_w
+
+def predict(w,X):
+
+	if X.shape[0] == X.size:
+		
+		predOut = activation( compute_y( w, X ) )
+		
+		return predOut
+		
+	else:
+		Xsize = X[ : , 0 ].size
+
+		predOut = np.empty( Xsize )
+		for row in range( predOut.size ):
+			predOut[ row ] = activation( compute_y( w, X[row] ) )
+	
+		return predOut
+	
+def accuracy(X,f,w0,max_iter,eta):
+
+	errors = 0.0
+	numRows = X[:, 0].size
+	
+	
+	for row in range( numRows ):
+		
+		Xtest = X[ row ]
+		Xtrain = np.delete( X, row, 0 )
+		ftrain = np.delete( f, row)
+		
+		weights = train_perceptron_sequential(Xtrain, ftrain, max_iter, w0, eta)
+		
+		fhat = predict(weights, Xtest)
+		
+		if fhat != f[row]:
+			errors += 1
+	
+	return 1 - (errors / numRows )
 
 if __name__ == '__main__':
     main()
