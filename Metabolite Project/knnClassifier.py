@@ -6,20 +6,28 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class customKnnC:
 	def __init__( self, tr_data_in, tr_label_in, neighbors_in ):
-		self.tr_data = tr_data_in
-		self.tr_label = tr_label_in
+		from sklearn.neighbors import KNeighborsClassifier
+		# Set variables
+		# self.tr_data = tr_data_in
+		# self.tr_label = tr_label_in
+		# neighbors = neighbors_in
 		
-		neighbors = neighbors_in
-		knnC = KNeighborsClassifier( n_neighbors=neighbors, weights='distance' )
-		knnC.fit( tr_data, tr_label )
+		# Initialize classifier
+		self.knnC = KNeighborsClassifier( n_neighbors=neighbors_in, weights='distance' )
+		
+		# Train data
+		self.knnC.fit( tr_data_in, tr_label_in )
+		# print self.knnC
 	
+	# Returns a score from given test data
 	def score( self, te_data, te_label ):
-		return knnC.score( te_data, te_label )
+		return self.knnC.score( te_data, te_label )
 
 def main():
 	
 		#Initialization
 	os.chdir('C:\\Users\\Jesse\\Google Drive\\SPRING 2015\\CSCI 334\\334 Code\\Metabolite Project')
+	
 	dfP = pd.read_csv( 'positive_train2.csv', header=0, index_col=0 )
 	dfN = pd.read_csv( 'negative_train2.csv', header=0, index_col=0 )
 
@@ -62,11 +70,16 @@ def main():
 	tr_label.resize( 40 )
 	te_label.resize( 20 )
 
-
 	knnC = KNeighborsClassifier( n_neighbors=5, weights='distance' )
 
 	knnC.fit( tr_data, tr_label )
 	print knnC.score( te_data, te_label )
+	
+def classTest():
+	
+	testC = customKnnC( tr_data, tr_label, 3 )
+	testC.score( te_data, te_label )
+
 	
 if __name__ == '__main__':
     main()
