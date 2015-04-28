@@ -4,7 +4,8 @@ import os
 import sklearn as sk
 from sklearn.neighbors import KNeighborsClassifier
 
-class customKnnC:
+class cKnn:
+	
 	def __init__( self, tr_data_in, tr_label_in, neighbors_in ):
 		from sklearn.neighbors import KNeighborsClassifier
 		# Set variables
@@ -23,6 +24,17 @@ class customKnnC:
 	def score( self, te_data, te_label ):
 		return self.knnC.score( te_data, te_label )
 
+	def posScore( self, te_data, te_label ):
+		posCount = 0
+		total = 0
+		for i in range( te_data.shape[0] ):
+			if te_label[i] == 1:    
+				total += 1
+				if int(self.knnC.predict(te_data[i])) == 1:
+					posCount += 1
+		posScore = float( posCount / total )
+		return posScore
+	
 def main():
 	
 		#Initialization
